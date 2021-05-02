@@ -52,6 +52,7 @@
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-insert-state-map (kbd "C-n") 'next-line)
   (define-key evil-insert-state-map (kbd "C-p") 'previous-line)
+  (define-key evil-insert-state-map (kbd "C-y") 'nil)
   (evil-mode 1)
 
   (use-package evil-leader
@@ -108,6 +109,9 @@
     :config
     (xclip-mode 1))
 
+(use-package spacemacs-theme
+  :defer t
+  :init (load-theme 'spacemacs-dark t))
 
 (use-package ivy
   :ensure t
@@ -164,6 +168,8 @@
   (global-company-mode 1)
 
   (global-set-key (kbd "C-<tab>") 'company-complete))
+  (global-unset-key (kbd "C-y"))
+  (define-key company-active-map (kbd "<C-y>") 'company-complete-selection)
 
 
 (setq gc-cons-threshold (* 100 1024 1024)
