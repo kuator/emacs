@@ -136,6 +136,62 @@
   (setq evil-goggles-enable-delete nil)
   (evil-goggles-mode))
 
+(use-package company
+  :ensure t
+  :defer t
+  :init (global-company-mode)
+  :config
+  (progn
+    ;; Use Company for completion
+    (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+
+    (setq company-tooltip-align-annotations t
+          ;; Easy navigation to candidates with M-<n>
+          company-show-numbers t)
+    (setq company-dabbrev-downcase nil))
+  :diminish company-mode)
+
+
+(use-package lsp-mode
+  :config
+  (add-hook 'c++-mode-hook #'lsp))
+
+
+(use-package company
+  :config
+  (setq company-idle-delay 0.3)
+
+  (global-company-mode 1)
+
+  (global-set-key (kbd "C-<tab>") 'company-complete))
+
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 (setq key-chord-two-keys-delay 0.5)
 (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
 (key-chord-mode 1)
@@ -168,4 +224,3 @@
 (setq display-line-numbers-type 'relative)
 
 (bind-key "C-h" 'delete-backward-char)
-
