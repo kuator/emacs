@@ -158,7 +158,9 @@
 
 (use-package lsp-mode
   :config
-  (add-hook 'c++-mode-hook #'lsp))
+  (add-hook 'c++-mode-hook #'lsp)
+  :custom
+  (lsp-enable-snippet t))
 
 
 (use-package company
@@ -207,6 +209,24 @@
   (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 
+(use-package yasnippet                  ; Snippets
+  :ensure t
+  :custom
+  (setq yas-inhibit-overlay-modification-protection t)
+  :config
+  ; (validate-setq
+  ;  yas-verbosity 1                      ; No need to be so verbose
+  ;  yas-wrap-around-region t)
+
+  ; (with-eval-after-load 'yasnippet
+  ;   (validate-setq yas-snippet-dirs '(yasnippet-snippets-dir)))
+
+  (yas-reload-all)
+  (yas-global-mode))
+
+(use-package yasnippet-snippets         ; Collection of snippets
+  :ensure t)
+
 
 
 
@@ -253,4 +273,5 @@
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 
-(bind-key "C-h" 'delete-backward-char)
+; (bind-key "C-h" 'delete-backward-char)
+(keyboard-translate ?\C-h ?\C-?)
