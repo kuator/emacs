@@ -31,7 +31,7 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; Enable Backup
-(setq backup-directory-alist '(("." . "~/config/emacs/backup"))
+(setq backup-directory-alist '(("." . "~/.config/emacs/backup"))
   backup-by-copying t    ; Don't delink hardlinks
   version-control t      ; Use version numbers on backups
   delete-old-versions t  ; Automatically delete excess backups
@@ -47,6 +47,7 @@
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
+  (setq evil-search-module 'evil-search)
   :config
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
@@ -224,8 +225,23 @@
   (yas-reload-all)
   (yas-global-mode))
 
-(use-package yasnippet-snippets         ; Collection of snippets
-  :ensure t)
+(use-package yasnippet-snippets)
+
+(use-package emmet-mode
+ :config
+ (add-hook 'css-mode-hook  'emmet-mode)
+ (add-hook 'js-mode-hook  'emmet-mode)
+ (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2))) ;; indent 2 spaces.
+ (setq emmet-expand-jsx-className? t) ;; default nil
+ )
+
+
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+
+
+
+
 
 
 
@@ -263,10 +279,6 @@
 ;; https://paul-grillenberger.de/2019/07/21/quickfix-muting-search-highlights-in-emacs-evil-mode/
 (define-key evil-normal-state-map (kbd "C-l") (progn 'redraw-frame 'evil-ex-nohighlight))
 
-(define-key evil-window-map "\C-h" 'evil-window-left)
-(define-key evil-window-map "\C-j" 'evil-window-down)
-(define-key evil-window-map "\C-k" 'evil-window-up)
-(define-key evil-window-map "\C-l" 'evil-window-right)
 
 (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
@@ -275,3 +287,60 @@
 
 ; (bind-key "C-h" 'delete-backward-char)
 (keyboard-translate ?\C-h ?\C-?)
+
+
+(define-key evil-window-map "\C-?" 'evil-window-left)
+(define-key evil-window-map "\C-j" 'evil-window-down)
+(define-key evil-window-map "\C-k" 'evil-window-up)
+(define-key evil-window-map "\C-l" 'evil-window-right)
+
+
+
+(with-eval-after-load 'lsp-mode
+  (defun lsp--to-yasnippet-snippet (snippet)
+    "Convert LSP SNIPPET to yasnippet snippet."
+    ;; LSP snippet doesn't escape "{" and "`", but yasnippet requires escaping it.
+    (replace-regexp-in-string
+     "{0.+}"
+     "{0}"
+     (replace-regexp-in-string (rx (or bos (not (any "$" "\\"))) (group (or "{" "`")))
+                               (rx "\\" (backref 1))
+                               snippet
+                               nil nil 1))))
+
+; (setq tab-width 2) ; or any other preferred valuej  (setq tab-width 2) ; or any other preferred value
+(setq js-indent-level 2)
+
+; (define-key evil-normal-state-map "" 'counsel-file-jump)
+(with-eval-after-load 'evil
+  (evil-set-leader '(normal) (kbd "<SPC>"))
+
+  ;; Interactive file name search.
+  ; (evil-define-key 'normal 'global (kbd "<leader>k") 'find-file-in-project)
+  ;; Interactive file content search (git).
+  ; (evil-define-key 'normal 'global (kbd "<leader>f") 'counsel-git-grep)
+  ;; Interactive current-file search.
+  ; (evil-define-key 'normal 'global (kbd "<leader>ss") 'swiper)
+  ;; Interactive open-buffer switch.
+  ; (evil-define-key 'normal 'global (kbd "<leader>b") 'counsel-switch-buffer)
+
+  ;; Find File
+  (evil-define-key 'normal 'global (kbd "<leader>tf") 'counsel-file-jump)
+  (evil-define-key 'normal 'global (kbd "<leader>tf") 'project-find-file)
+  )
+
+(define-key company-active-map (kbd "C-j") nil)
+(define-key company-active-map (kbd "C-k") nil)
+
+
+(defun toggle-term ()
+  "Toggles between terminal and current buffer (creates terminal, if none exists)"
+  (interactive)
+  (if (string= (buffer-name) "*ansi-term*")
+      (switch-to-buffer (other-buffer (current-buffer)))
+    (if (get-buffer "*ansi-term*")
+        (switch-to-buffer "*ansi-term*")
+      (progn
+        (ansi-term (getenv "SHELL"))
+        (setq show-trailing-whitespace nil)))))
+(global-set-key (kbd "<f9>") 'toggle-term)
