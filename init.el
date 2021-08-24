@@ -25,7 +25,7 @@
 
 ;; Let's turn off unwanted window decoration.
 (tool-bar-mode -1)
-(scroll-bar-mode -1)
+;; (scroll-bar-mode -1)
 
 ;; Make the yes or no prompts shorter.
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -65,6 +65,13 @@
     :after evil
     :diminish
     :config (evil-commentary-mode +1))
+
+  (use-package evil-replace-with-register
+    :after evil
+    :diminish
+    :config
+    (setq evil-replace-with-register-key (kbd "gr"))
+    (evil-replace-with-register-install))
 
   (use-package evil-surround
     :config
@@ -146,6 +153,11 @@
   :defer t
   :init (global-company-mode)
   :config
+  (global-unset-key (kbd "C-y"))
+  (setq company-idle-delay 0.3)
+  (define-key company-active-map (kbd "C-y") 'company-complete-selection)
+  ; (define-key company-active-map (kbd "C-p") #'company-select-previous-or-abort)
+  ; (define-key company-active-map (kbd "C-n") #'company-select-next-or-abort)
   (progn
     ;; Use Company for completion
     (bind-key [remap completion-at-point] #'company-complete company-mode-map)
@@ -164,15 +176,17 @@
   (lsp-enable-snippet t))
 
 
-(use-package company
-  :config
-  (setq company-idle-delay 0.3)
+; (use-package company
+;   :config
+;   (setq company-idle-delay 0.3)
 
-  (global-company-mode 1)
+;   (global-company-mode 1)
 
-  (global-set-key (kbd "C-<tab>") 'company-complete))
-  (global-unset-key (kbd "C-y"))
-  (define-key company-active-map (kbd "<C-y>") 'company-complete-selection)
+;   (global-set-key (kbd "C-<tab>") 'company-complete)
+;   (global-unset-key (kbd "C-y"))
+;   (define-key company-active-map (kbd "C-y") 'company-complete-selection)
+;   (define-key company-active-map (kbd "C-p") #'company-select-previous-or-abort)
+;   (define-key company-active-map (kbd "C-n") #'company-select-next-or-abort))
 
 
 (setq gc-cons-threshold (* 100 1024 1024)
@@ -344,3 +358,15 @@
         (ansi-term (getenv "SHELL"))
         (setq show-trailing-whitespace nil)))))
 (global-set-key (kbd "<f9>") 'toggle-term)
+
+;; Keep underscores within a word boundary
+
+; (add-hook 'python-mode-hook
+;           (lambda () (modify-syntax-entry ?_ "w" python-mode-syntax-table)))
+
+;; (with-eval-after-load 'evil
+;;     (defalias #'forward-evil-word #'forward-evil-symbol)
+;;     ;; make evil-search-word look for symbol rather than word boundaries
+;;     (setq-default evil-symbol-word-search t))
+;; (defalias 'forward-evil-word 'forward-evil-symbol)
+
